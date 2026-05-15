@@ -38,8 +38,14 @@
                         <input type="date" name="to_date" max="{{ now()->toDateString() }}" value="{{ old('to_date') }}" required class="mt-1 block border-gray-300 rounded-md" />
                     </div>
 
-                    <div>
+                    <div class="mb-4">
+                        <label class="block text-sm">Reason</label>
+                        <textarea name="reason" rows="3" maxlength="2000" class="mt-1 block w-full border-gray-300 rounded-md">{{ old('reason') }}</textarea>
+                    </div>
+
+                    <div class="flex items-center gap-3">
                         <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded">Apply Leave</button>
+                        <a href="{{ route('leaves.list') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">Cancel</a>
                     </div>
                 </form>
 

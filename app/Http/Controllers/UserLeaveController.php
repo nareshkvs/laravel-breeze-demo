@@ -4,13 +4,27 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\UserLeaves;
-use App\Models\TimeLogs;
+use App\Services\LeaveService;
+use App\Models\UserLeave;
+use App\Enums\LeaveStatus;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Foundation\Validation\ValidatesRequests;
+use App\Policies\LeavePolicy;
 
 class UserLeaveController extends Controller
 {
+    use AuthorizesRequests, ValidatesRequests;
+    
+    /**
+     * @var LeaveService
+     */
+    protected LeaveService $service;
+
+    public function __construct(LeaveService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
         return view('leaves.index');
@@ -22,12 +36,19 @@ class UserLeaveController extends Controller
     public function list()
     {
         $user = Auth::user();
-
-        $leaves = UserLeaves::where('user_id', $user->id)
-            ->orderBy('from_date', 'desc')
-            ->get();
-
+        $leaves = $this->service->listForUser($user);
         return view('leaves.list', compact('leaves'));
+    }
+
+    /**
+     * Delete a leave request.
+     */
+    public function destroy($id)
+    {
+        $user = Auth::user();
+        $leave = $this->service->deleteForUser($user, $id);
+        $range = $leave->from_date->toDateString() . ' to ' . $leave->to_date->toDateString();
+        return redirect()->route('leaves.list')->with('success', "Leave ({$range}) deleted.");
     }
 
     public function store(Request $request)
@@ -39,25 +60,29 @@ class UserLeaveController extends Controller
             'to_date' => ['required', 'date', 'after_or_equal:from_date', 'before_or_equal:today'],
         ]);
 
-        $from = Carbon::parse($request->input('from_date'))->startOfDay();
-        $to = Carbon::parse($request->input('to_date'))->startOfDay();
-
-        // Check for any time logs in the range
-        $conflict = TimeLogs::where('user_id', $user->id)
-            ->whereBetween('work_date', [$from->toDateString(), $to->toDateString()])
-            ->exists();
-
-        if ($conflict) {
-            return back()->withErrors(['from_date' => 'Cannot apply leave: work reports exist in the selected date range.'])->withInput();
+        try {
+            $leave = $this->service->create($request->only(['from_date','to_date','reason']), $user);
+            return redirect()->route('leaves.list')->with('success', 'Leave request submitted.');
+        } catch (\Exception $ex) {
+            return back()->withErrors(['from_date' => $ex->getMessage()])->withInput();
         }
+    }
 
-        UserLeaves::create([
-            'user_id' => $user->id,
-            'from_date' => $from->toDateString(),
-            'to_date' => $to->toDateString(),
-            'status' => 'pending',
+    /**
+     * Update leave status (approve/unapprove) - admin action.
+     */
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => ['required', 'in:'.implode(',', array_column(LeaveStatus::cases(), 'value'))],
         ]);
 
-        return redirect()->route('leaves.list')->with('success', 'Leave request submitted.');
+        $leave = UserLeave::findOrFail($id);
+
+        $this->authorize('approve', $leave);
+
+        $this->service->setStatus($id, $request->input('status'));
+
+        return redirect()->route('leaves.list')->with('success', 'Leave status updated.');
     }
 }

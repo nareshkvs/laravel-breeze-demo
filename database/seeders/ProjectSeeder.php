@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use App\Models\Projects;
+use App\Models\Project;
 
 class ProjectSeeder extends Seeder
 {
@@ -13,7 +13,7 @@ class ProjectSeeder extends Seeder
      */
     public function run(): void
     {
-        Projects::insert([
+        Project::insert([
             [
                 'name' => 'Website Development',
                 'status' => 'active',

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('time_log_entries', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('time_logs_id')
+            $table->foreignId('time_log_id')
                   ->constrained()
                   ->onDelete('cascade');
 

@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class UserLeaves extends Model
+class UserLeave extends Model
 {
     use HasFactory;
 
@@ -14,12 +14,14 @@ class UserLeaves extends Model
         'user_id',
         'from_date',
         'to_date',
+        'reason',
         'status',
     ];
 
     protected $casts = [
         'from_date' => 'date',
         'to_date'   => 'date',
+        'status'    => \App\Enums\LeaveStatus::class,
     ];
 
     /*

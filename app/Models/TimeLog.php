@@ -7,15 +7,18 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class TimeLogEntries extends Model
+class TimeLog extends Model
 {
     use HasFactory;
 
     protected $fillable = [
-        'time_logs_id',
-        'project_id',
-        'description',
-        'duration_minutes',
+        'user_id',
+        'work_date',
+        'total_minutes',
+    ];
+
+    protected $casts = [
+        'work_date' => 'date',
     ];
 
     /*
@@ -24,15 +27,15 @@ class TimeLogEntries extends Model
     |-----------------------------------
     */
 
-    // Entry belongs to one TimeLog
-    public function timeLog(): BelongsTo
+    // TimeLog belongs to one user
+    public function user(): BelongsTo
     {
-        return $this->belongsTo(TimeLogs::class);
+        return $this->belongsTo(User::class);
     }
 
-    // Entry belongs to one Project
-    public function project(): BelongsTo
+    // TimeLog has many task entries
+    public function entries(): HasMany
     {
-        return $this->belongsTo(Projects::class);
+        return $this->hasMany(TimeLogEntry::class);
     }
 }

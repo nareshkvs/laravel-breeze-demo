@@ -28,6 +28,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Time Log List
     Route::get('/time-logs/list', [TimeLogController::class, 'list'])->name('time-logs.list');
+    // Delete Time Log
+    Route::delete('/time-logs/{id}', [TimeLogController::class, 'destroy'])->name('time-logs.destroy');
 
     // Store Time Log
     Route::post('/time-logs', [TimeLogController::class, 'store'])->name('time-logs.store');
@@ -37,8 +39,15 @@ Route::middleware(['auth'])->group(function () {
 
     // Leave List
     Route::get('/leaves/list', [UserLeaveController::class, 'list'])->name('leaves.list');
+    // Delete Leave
+    Route::delete('/leaves/{id}', [UserLeaveController::class, 'destroy'])->name('leaves.destroy');
+    // Update Leave Status (approve/unapprove)
+    Route::patch('/leaves/{id}/status', [UserLeaveController::class, 'updateStatus'])->name('leaves.updateStatus');
 
     // Store Leave
     Route::post('/leaves', [UserLeaveController::class, 'store'])->name('leaves.store');
+
+    // Admin overview (leaves + timelogs)
+    Route::get('/admin/overview', [TimeLogController::class, 'adminOverview'])->name('admin.overview');
 
 });

@@ -18,8 +18,9 @@ return new class extends Migration
                   ->onDelete('cascade');
             $table->date('from_date');
             $table->date('to_date');
+            $table->text('reason')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected'])
-                  ->default('pending');
+                  ->default('pending');            
             $table->timestamps();
         });
     }

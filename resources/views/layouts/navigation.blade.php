@@ -21,6 +21,11 @@
                     <x-nav-link :href="route('leaves.list')" :active="request()->routeIs('leaves.*')">
                         {{ __('Leaves') }}
                     </x-nav-link>
+                    @if(Auth::user() && Auth::user()->isAdmin())
+                        <x-nav-link :href="route('admin.overview')" :active="request()->routeIs('admin.*')">
+                            {{ __('Admin Overview') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -82,6 +87,11 @@
             <x-responsive-nav-link :href="route('leaves.list')" :active="request()->routeIs('leaves.*')">
                 {{ __('Leaves') }}
             </x-responsive-nav-link>
+            @if(Auth::user() && Auth::user()->isAdmin())
+                <x-responsive-nav-link :href="route('admin.overview')" :active="request()->routeIs('admin.*')">
+                    {{ __('Admin Overview') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

@@ -33,6 +33,13 @@
                                             @endforeach
                                         </ul>
                                     </td>
+                                    <td class="py-2">
+                                        <form method="POST" action="{{ route('time-logs.destroy', $log->id) }}" onsubmit="return confirm('Delete time log for {{ $log->work_date->toDateString() }}? This will erase all time log records for this date.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

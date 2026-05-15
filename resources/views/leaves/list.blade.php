@@ -19,6 +19,7 @@
                                 <th>From</th>
                                 <th>To</th>
                                 <th>Status</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -26,7 +27,35 @@
                                 <tr class="border-t">
                                     <td class="py-2">{{ $lv->from_date->toDateString() }}</td>
                                     <td class="py-2">{{ $lv->to_date->toDateString() }}</td>
-                                    <td class="py-2">{{ ucfirst($lv->status) }}</td>
+                                    <td class="py-2">{{ ucfirst(is_object($lv->status) ? $lv->status->value : $lv->status) }}</td>
+                                    <td class="py-2 flex gap-2">
+                                        @if(Auth::user()->isAdmin())
+                                            @php
+                                                $statusVal = is_object($lv->status) ? $lv->status->value : $lv->status;
+                                            @endphp
+                                            @if($statusVal !== 'approved')
+                                                <form method="POST" action="{{ route('leaves.updateStatus', $lv->id) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="status" value="approved" />
+                                                    <button type="submit" class="bg-green-600 text-white px-3 py-1 rounded">Approve</button>
+                                                </form>
+                                            @else
+                                                <form method="POST" action="{{ route('leaves.updateStatus', $lv->id) }}">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <input type="hidden" name="status" value="pending" />
+                                                    <button type="submit" class="bg-yellow-600 text-white px-3 py-1 rounded">Unapprove</button>
+                                                </form>
+                                            @endif
+                                        @endif
+
+                                        <form method="POST" action="{{ route('leaves.destroy', $lv->id) }}" onsubmit="return confirm('Delete leave from {{ $lv->from_date->toDateString() }} to {{ $lv->to_date->toDateString() }}? This will erase the leave request.');">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="bg-red-600 text-white px-3 py-1 rounded">Delete</button>
+                                        </form>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

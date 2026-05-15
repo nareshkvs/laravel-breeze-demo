@@ -6,24 +6,6 @@ cd /var/www
 echo "Bootstrapping Laravel..."
 
 # -----------------------------------
-# 1. Install Laravel if missing
-# -----------------------------------
-if [ ! -f artisan ]; then
-    echo "Laravel not found. Installing..."
-
-    rm -rf temp
-
-    composer create-project laravel/laravel temp
-
-    echo "Moving Laravel files..."
-
-    mv temp/* .
-    mv temp/.[!.]* . 2>/dev/null || true
-
-    rm -rf temp
-fi
-
-# -----------------------------------
 # 2. Ensure correct .env (IMPORTANT)
 # -----------------------------------
 echo "Applying Docker environment configuration..."
@@ -35,7 +17,6 @@ cp .env.docker .env
 if [ ! -d vendor ]; then
     echo "Installing dependencies..."
     composer install --no-interaction --prefer-dist --optimize-autoloader
-    composer require laravel/breeze --dev
 fi
 
 # -----------------------------------
@@ -69,7 +50,7 @@ try {
     sleep 2
 done
 
-php artisan breeze:install
+#php artisan breeze:install
 
 # -----------------------------------
 # 7. Run migrations (background)

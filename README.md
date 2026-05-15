@@ -1,58 +1,94 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Starlfinx Demo
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+This repository contains a Laravel demo application with time-logging and leave management features.
 
-## About Laravel
+This Dockerfile is configured to install PHP, Composer, Node/npm, and will attempt to scaffold Laravel Breeze and build frontend assets during image build. See notes below.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Build the Docker image
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
-
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+From the project root run:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+docker build -t starlfinx-demo1-app .
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+Or, using docker-compose:
 
-## Contributing
+```bash
+docker-compose build
+docker-compose up -d
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+## What the Dockerfile does
 
-## Code of Conduct
+- Installs PHP 8.4 and required PHP extensions
+- Installs Node.js (npm) so front-end tooling is available
+- Runs `composer install` to install PHP dependencies
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+Recommended workflow (safe):
 
-## Security Vulnerabilities
+1. Build the image without relying on artisan scaffolding:
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```bash
+docker build -t starlfinx-demo1-app .
+docker run --rm -it -v $(pwd):/var/www starlfinx-demo1-app bash
+# inside container
+composer install
+php artisan key:generate
+php artisan migrate --seed
+composer require laravel/breeze --dev
+php artisan breeze:install
+npm ci
+npm run build
+```
 
-## License
+2. Or run the Breeze install and npm steps on your host machine before building the production image.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+## Running migrations & seeds
+
+Once the container is running and you have DB connectivity configured, run:
+
+```bash
+docker exec -it <container> php artisan migrate --seed
+```
+
+## Permissions
+
+Ensure `storage` and `bootstrap/cache` are writable by the web server user. The Dockerfile attempts to set permissions, but on some host setups you may need to adjust ownership.
+
+## Rebuilding assets
+
+If you change front-end code (resources/js or resources/css):
+
+```bash
+npm ci
+npm run build
+```
+
+Or inside the container:
+
+```bash
+docker exec -it <container> npm run build
+```
+
+## Troubleshooting
+
+- If Breeze scaffolding did not appear, run `composer require laravel/breeze --dev` and `php artisan breeze:install` inside the container or locally and rebuild assets.
+- If artisan commands fail due to missing `.env`, copy `.env.example` to `.env` and run `php artisan key:generate`.
+
+## Accessing services (URLs)
+
+By default the compose setup exposes the application and helper services to localhost. Confirm actual ports in `docker-compose.yml` if you changed them.
+
+- Application (Nginx): http://localhost/ (port 80)
+- MailHog (email testing UI): http://localhost:8025/
+- phpMyAdmin (database GUI): http://localhost:8080/  
+	- Default DB connection values from `docker-compose.yml`: host=`mysql`, user=`user`, password=`user123`, database=`laravel_db`.
+
+If ports in your `docker-compose.yml` are different, adjust the host URLs accordingly. You can list running containers and their ports with:
+
+```bash
+docker-compose ps
+# or
+docker ps
+```

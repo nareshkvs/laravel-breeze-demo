@@ -4,9 +4,9 @@
     </x-slot>
 
     <div class="py-6">
-        <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
+        <div class="max-w-6xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
-                <div class="mb-4">
+                <div class="mb-4 mr-4 flex justify-end">
                     <a href="{{ route('time-logs.index') }}" class="text-blue-600">+ Add Time Log</a>
                 </div>
 
@@ -17,14 +17,21 @@
                         <thead>
                             <tr class="text-left">
                                 <th>Date</th>
+                                @if(Auth::user() && Auth::user()->isAdmin())
+                                    <th>Email</th>
+                                @endif
                                 <th>Total</th>
                                 <th>Entries</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($logs as $log)
                                 <tr class="border-t">
                                     <td class="py-2">{{ $log->work_date->toDateString() }}</td>
+                                    @if(Auth::user() && Auth::user()->isAdmin())
+                                        <td class="py-2">{{ $log->user->email ?? '' }}</td>
+                                    @endif
                                     <td class="py-2">{{ intdiv($log->total_minutes,60) }}h {{ $log->total_minutes % 60 }}m</td>
                                     <td class="py-2">
                                         <ul>

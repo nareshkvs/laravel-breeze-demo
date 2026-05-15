@@ -55,6 +55,13 @@
                         const clientErrors = document.getElementById('client-errors');
                         const clientErrorsList = document.getElementById('client-errors-list');
 
+                        // Existing leaves for this user, injected from server
+                        const existingLeaves = @json(isset($existingLeaves) ? $existingLeaves->map(function($l){ return ['from' => $l->from_date->toDateString(), 'to' => $l->to_date->toDateString() ]; }) : []);
+
+                        function rangesOverlap(aFrom, aTo, bFrom, bTo) {
+                            return !(aTo < bFrom || aFrom > bTo);
+                        }
+
                         form.addEventListener('submit', function(ev){
                             clientErrorsList.innerHTML = '';
                             clientErrors.classList.add('hidden');
@@ -68,6 +75,17 @@
                             if (from && to && to < from) errors.push('To date must be the same or after From date.');
                             if (from && from > today) errors.push('From date cannot be in the future.');
                             if (to && to > today) errors.push('To date cannot be in the future.');
+
+                            // Client-side overlap check with existing leaves
+                            if (from && to && existingLeaves && existingLeaves.length) {
+                                for (let i=0;i<existingLeaves.length;i++){
+                                    const ex = existingLeaves[i];
+                                    if (rangesOverlap(from, to, ex.from, ex.to)){
+                                        errors.push(`Selected range overlaps an existing leave (${ex.from} to ${ex.to}).`);
+                                        break;
+                                    }
+                                }
+                            }
 
                             if (errors.length>0) {
                                 ev.preventDefault();

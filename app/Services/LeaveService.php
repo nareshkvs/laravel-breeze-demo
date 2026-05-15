@@ -14,6 +14,16 @@ class LeaveService
         $from = Carbon::parse($data['from_date'])->startOfDay();
         $to = Carbon::parse($data['to_date'])->startOfDay();
 
+        // Prevent overlapping leaves for the same user
+        $overlap = UserLeave::where('user_id', $user->id)
+            ->whereDate('from_date', '<=', $to->toDateString())
+            ->whereDate('to_date', '>=', $from->toDateString())
+            ->exists();
+
+        if ($overlap) {
+            throw new \Exception('Cannot apply leave: overlapping leave already exists for the selected date range.');
+        }
+
         // Check for any time logs in the range
         $conflict = TimeLog::where('user_id', $user->id)
             ->whereBetween('work_date', [$from->toDateString(), $to->toDateString()])
@@ -42,11 +52,11 @@ class LeaveService
     /**
      * List all leaves (admin view).
      */
-    public function listAll()
+    public function listAll(int|null $limit = null)
     {
         return UserLeave::with('user')
             ->orderBy('from_date', 'desc')
-            ->limit(5)
+            ->limit($limit)
             ->get();
     }
 

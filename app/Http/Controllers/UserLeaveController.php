@@ -27,7 +27,9 @@ class UserLeaveController extends Controller
 
     public function index()
     {
-        return view('leaves.index');
+        $user = Auth::user();
+        $existingLeaves = $this->service->listForUser($user);
+        return view('leaves.index', compact('existingLeaves'));
     }
 
     /**
@@ -36,8 +38,12 @@ class UserLeaveController extends Controller
     public function list()
     {
         $user = Auth::user();
-        $leaves = $this->service->listForUser($user);
-        return view('leaves.list', compact('leaves'));
+        if ($user->isAdmin()) {
+            $leaves = $this->service->listAll();
+        } else {
+            $leaves = $this->service->listForUser($user);
+        }
+        return view('leaves.list', compact('leaves'));        
     }
 
     /**

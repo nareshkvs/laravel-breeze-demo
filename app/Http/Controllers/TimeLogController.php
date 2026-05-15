@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Projects;
+use App\Models\Project;
 use App\Services\TimeLogService;
 use App\Services\LeaveService;
 
@@ -54,8 +54,8 @@ class TimeLogController extends Controller
             abort(403);
         }
 
-        $leaves = $this->leaveService->listAll();
-        $logs = $this->service->listAll();
+        $leaves = $this->leaveService->listAll(5);
+        $logs = $this->service->listAll(5);
 
         return view('admin.overview', compact('leaves','logs'));
     }

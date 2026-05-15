@@ -114,11 +114,11 @@ class TimeLogService
     /**
      * List all time logs (admin view).
      */
-    public function listAll()
+    public function listAll(int|null $limit = null)
     {
         return TimeLog::with('entries.project', 'user')
             ->orderBy('work_date', 'desc')
-            ->limit(5)
+            ->limit($limit)
             ->get();
     }
 

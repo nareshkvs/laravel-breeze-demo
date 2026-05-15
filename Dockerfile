@@ -22,5 +22,10 @@ COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
     && sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh
 
+RUN chown -R www-data:www-data /var/www/storage \
+    && chown -R www-data:www-data /var/www/bootstrap/cache \
+    && chmod -R 775 /var/www/storage \
+    && chmod -R 775 /var/www/bootstrap/cache
+
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["php-fpm", "-F"]

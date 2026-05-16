@@ -70,7 +70,7 @@
 
                     <div class="flex items-center gap-3">
                         <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded">Submit Time Log</button>
-                        <a href="{{ route('time-logs.list') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">Cancel</a>
+                        <a href="{{ route('time-logs.index') }}" class="bg-gray-300 text-gray-800 px-4 py-2 rounded">Cancel</a>
                     </div>
                 </form>
             </div>

@@ -57,6 +57,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        <a href="{{ route('leaves.index') }}" class="text-blue-600">View All Leaves</a>
+                    </div>
                 @endif
             </div>
 
@@ -91,6 +94,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        <a href="{{ route('time-logs.index') }}" class="text-blue-600">View All Time Logs</a>
+                    </div>
                 @endif
             </div>
         </div>

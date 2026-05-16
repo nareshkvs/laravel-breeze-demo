@@ -15,10 +15,10 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('time-logs.list')" :active="request()->routeIs('time-logs.*')">
+                    <x-nav-link :href="route('time-logs.index')" :active="request()->routeIs('time-logs.*')">
                         {{ __('Time Logs') }}
                     </x-nav-link>
-                    <x-nav-link :href="route('leaves.list')" :active="request()->routeIs('leaves.*')">
+                    <x-nav-link :href="route('leaves.index')" :active="request()->routeIs('leaves.*')">
                         {{ __('Leaves') }}
                     </x-nav-link>
                     @if(Auth::user() && Auth::user()->isAdmin())
@@ -81,10 +81,10 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('time-logs.list')" :active="request()->routeIs('time-logs.*')">
+            <x-responsive-nav-link :href="route('time-logs.index')" :active="request()->routeIs('time-logs.*')">
                 {{ __('Time Logs') }}
             </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('leaves.list')" :active="request()->routeIs('leaves.*')">
+            <x-responsive-nav-link :href="route('leaves.index')" :active="request()->routeIs('leaves.*')">
                 {{ __('Leaves') }}
             </x-responsive-nav-link>
             @if(Auth::user() && Auth::user()->isAdmin())

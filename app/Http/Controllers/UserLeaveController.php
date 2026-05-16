@@ -25,7 +25,7 @@ class UserLeaveController extends Controller
         $this->service = $service;
     }
 
-    public function index()
+    public function create()
     {
         $user = Auth::user();
         $existingLeaves = $this->service->listForUser($user);
@@ -35,7 +35,7 @@ class UserLeaveController extends Controller
     /**
      * Display list of user's leaves.
      */
-    public function list()
+    public function index()
     {
         $user = Auth::user();
         if ($user->isAdmin()) {
@@ -54,7 +54,7 @@ class UserLeaveController extends Controller
         $user = Auth::user();
         $leave = $this->service->deleteForUser($user, $id);
         $range = $leave->from_date->toDateString() . ' to ' . $leave->to_date->toDateString();
-        return redirect()->route('leaves.list')->with('success', "Leave ({$range}) deleted.");
+        return redirect()->route('leaves.index')->with('success', "Leave ({$range}) deleted.");
     }
 
     public function store(Request $request)
@@ -68,7 +68,7 @@ class UserLeaveController extends Controller
 
         try {
             $leave = $this->service->create($request->only(['from_date','to_date','reason']), $user);
-            return redirect()->route('leaves.list')->with('success', 'Leave request submitted.');
+            return redirect()->route('leaves.index')->with('success', 'Leave request submitted.');
         } catch (\Exception $ex) {
             return back()->withErrors(['from_date' => $ex->getMessage()])->withInput();
         }
@@ -89,6 +89,6 @@ class UserLeaveController extends Controller
 
         $this->service->setStatus($id, $request->input('status'));
 
-        return redirect()->route('leaves.list')->with('success', 'Leave status updated.');
+        return redirect()->route('leaves.index')->with('success', 'Leave status updated.');
     }
 }

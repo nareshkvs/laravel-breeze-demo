@@ -7,7 +7,7 @@
         <div class="max-w-4xl mx-auto sm:px-6 lg:px-8">
             <div class="bg-white shadow-sm sm:rounded-lg p-6">
                 <div class="mb-4 mr-4 flex justify-end">
-                    <a href="{{ route('leaves.index') }}" class="text-blue-600">+ Apply Leave</a>
+                    <a href="{{ route('leaves.create') }}" class="text-blue-600">+ Apply Leave</a>
                 </div>
 
                 @if($leaves->isEmpty())

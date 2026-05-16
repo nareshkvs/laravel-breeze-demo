@@ -24,10 +24,10 @@ require __DIR__.'/auth.php';
 Route::middleware(['auth'])->group(function () {
 
     // Time Log Form Page
-    Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
+    Route::get('/time-logs/create', [TimeLogController::class, 'create'])->name('time-logs.create');
 
     // Time Log List
-    Route::get('/time-logs/list', [TimeLogController::class, 'list'])->name('time-logs.list');
+    Route::get('/time-logs', [TimeLogController::class, 'index'])->name('time-logs.index');
     // Delete Time Log
     Route::delete('/time-logs/{id}', [TimeLogController::class, 'destroy'])->name('time-logs.destroy');
 
@@ -35,10 +35,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/time-logs', [TimeLogController::class, 'store'])->name('time-logs.store');
 
     // Leave Form
-    Route::get('/leaves', [UserLeaveController::class, 'index'])->name('leaves.index');
+    Route::get('/leaves/create', [UserLeaveController::class, 'create'])->name('leaves.create');
 
     // Leave List
-    Route::get('/leaves/list', [UserLeaveController::class, 'list'])->name('leaves.list');
+    Route::get('/leaves', [UserLeaveController::class, 'index'])->name('leaves.index');
     // Delete Leave
     Route::delete('/leaves/{id}', [UserLeaveController::class, 'destroy'])->name('leaves.destroy');
     // Update Leave Status (approve/unapprove)

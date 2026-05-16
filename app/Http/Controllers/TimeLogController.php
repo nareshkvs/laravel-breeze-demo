@@ -26,7 +26,7 @@ class TimeLogController extends Controller
     /**
      * Show the time log form.
      */
-    public function index()
+    public function create()
     {
         $projects = Project::where('status', 'active')->get();
 
@@ -36,7 +36,7 @@ class TimeLogController extends Controller
     /**
      * Display list of user's time logs.
      */
-    public function list()
+    public function index()
     {
         $user = Auth::user();
         $logs = $this->service->listForUser($user);
@@ -68,7 +68,7 @@ class TimeLogController extends Controller
         $user = Auth::user();
         $timeLog = $this->service->deleteForUser($user, $id);
         $date = $timeLog->work_date->toDateString();
-        return redirect()->route('time-logs.list')->with('success', "Time log for {$date} deleted.");
+        return redirect()->route('time-logs.index')->with('success', "Time log for {$date} deleted.");
     }
 
     /**
@@ -88,7 +88,7 @@ class TimeLogController extends Controller
 
         try {
             $this->service->create($request->only(['work_date','entries']), $user);
-            return redirect()->route('time-logs.list')->with('success', 'Time log saved.');
+            return redirect()->route('time-logs.index')->with('success', 'Time log saved.');
         } catch (\Exception $ex) {
             return back()->withErrors(['error' => $ex->getMessage()])->withInput();
         }

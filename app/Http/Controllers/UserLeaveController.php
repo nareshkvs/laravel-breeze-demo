@@ -2,13 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\User;
 use App\Services\LeaveService;
 use App\Models\UserLeave;
 use App\Enums\LeaveStatus;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
+use App\Enums\PaginationCount;
 use App\Policies\LeavePolicy;
 
 class UserLeaveController extends Controller
@@ -35,15 +37,20 @@ class UserLeaveController extends Controller
     /**
      * Display list of user's leaves.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $perPage = intval($request->input('per_page', PaginationCount::ONE->value));
+        $selectedUser = $request->input('user_id');
+
         if ($user->isAdmin()) {
-            $leaves = $this->service->listAll();
+            $users = User::orderBy('name')->get();
+            $leaves = $this->service->listAllPaginated($perPage, $selectedUser ? intval($selectedUser) : null);
+            return view('leaves.list', compact('leaves','users','selectedUser'));
         } else {
-            $leaves = $this->service->listForUser($user);
+            $leaves = $this->service->listForUserPaginated($user, $perPage);
+            return view('leaves.list', compact('leaves'));
         }
-        return view('leaves.list', compact('leaves'));        
     }
 
     /**

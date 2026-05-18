@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Enums\PaginationCount;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
+use App\Models\User;
 use App\Models\Project;
 use App\Services\TimeLogService;
 use App\Services\LeaveService;
@@ -36,12 +38,21 @@ class TimeLogController extends Controller
     /**
      * Display list of user's time logs.
      */
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
-        $logs = $this->service->listForUser($user);
+        $perPage = intval($request->input('per_page', PaginationCount::ONE->value));
+        $selectedUser = $request->input('user_id');
 
-        return view('time_logs.list', compact('logs'));
+        if ($user->isAdmin()) {
+            // provide users list for filter
+            $users = User::orderBy('name')->get();
+            $logs = $this->service->listAllPaginated($perPage, $selectedUser ? intval($selectedUser) : null);
+            return view('time_logs.list', compact('logs','users','selectedUser'));
+        } else {
+            $logs = $this->service->listForUserPaginated($user, $perPage);
+            return view('time_logs.list', compact('logs'));
+        }
     }
 
     /**

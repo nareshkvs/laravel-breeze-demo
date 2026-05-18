@@ -50,14 +50,35 @@ class LeaveService
     }
 
     /**
+     * Paginated list for a user
+     */
+    public function listForUserPaginated($user, int $perPage = PaginationCount::ONE->value)
+    {
+        return UserLeave::where('user_id', $user->id)
+            ->orderBy('from_date', 'desc')
+            ->paginate($perPage);
+    }
+
+    /**
      * List all leaves (admin view).
      */
     public function listAll(int|null $limit = null)
     {
         return UserLeave::with('user')
             ->orderBy('from_date', 'desc')
-            ->limit($limit)
+            ->when($limit, function($q) use ($limit){ $q->limit($limit); })
             ->get();
+    }
+
+    /**
+     * Paginated list of all leaves, optional filter by user_id
+     */
+    public function listAllPaginated(int $perPage = 15, int|null $userId = null)
+    {
+        return UserLeave::with('user')
+            ->when($userId, function($q) use ($userId){ $q->where('user_id', $userId); })
+            ->orderBy('from_date', 'desc')
+            ->paginate($perPage);
     }
 
     public function deleteForUser($user, $id)

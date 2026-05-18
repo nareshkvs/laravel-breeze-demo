@@ -13,6 +13,20 @@
                 @if($leaves->isEmpty())
                     <div>No leave requests yet.</div>
                 @else
+                    @if(Auth::user() && Auth::user()->isAdmin())
+                        <div class="mb-4 flex items-center gap-4">
+                            <form method="GET" action="{{ route('leaves.index') }}" class="flex items-center gap-2">
+                                <label class="text-sm">User:</label>
+                                <select name="user_id" class="border-gray-300 rounded">
+                                    <option value="">All</option>
+                                    @foreach($users as $u)
+                                        <option value="{{ $u->id }}" {{ (isset($selectedUser) && $selectedUser == $u->id) ? 'selected' : '' }}>{{ $u->email }} ({{ $u->name }})</option>
+                                    @endforeach
+                                </select>
+                                <button class="bg-gray-200 px-3 py-1 rounded">Filter</button>
+                            </form>
+                        </div>
+                    @endif
                     <table class="w-full table-auto">
                         <thead>
                             <tr class="text-left">
@@ -66,6 +80,9 @@
                             @endforeach
                         </tbody>
                     </table>
+                    <div class="mt-4">
+                        {{ $leaves->appends(request()->query())->links() }}
+                    </div>
                 @endif
             </div>
         </div>

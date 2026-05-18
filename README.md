@@ -1,4 +1,4 @@
-# Starlfinx Demo
+# Time Logs Task Demo
 
 This repository contains a Laravel demo application with time-logging and leave management features.
 

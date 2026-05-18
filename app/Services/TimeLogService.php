@@ -112,14 +112,36 @@ class TimeLogService
     }
 
     /**
+     * Paginated list for a user
+     */
+    public function listForUserPaginated($user, int $perPage = PaginationCount::ONE->value)
+    {
+        return TimeLog::with('entries.project')
+            ->where('user_id', $user->id)
+            ->orderBy('work_date', 'desc')
+            ->paginate($perPage);
+    }
+
+    /**
      * List all time logs (admin view).
      */
     public function listAll(int|null $limit = null)
     {
         return TimeLog::with('entries.project', 'user')
             ->orderBy('work_date', 'desc')
-            ->limit($limit)
+            ->when($limit, function($q) use ($limit){ $q->limit($limit); })
             ->get();
+    }
+
+    /**
+     * Paginated list of all time logs, optional filter by user_id
+     */
+    public function listAllPaginated(int $perPage = PaginationCount::ONE->value, int|null $userId = null)
+    {
+        return TimeLog::with('entries.project', 'user')
+            ->when($userId, function($q) use ($userId){ $q->where('user_id', $userId); })
+            ->orderBy('work_date', 'desc')
+            ->paginate($perPage);
     }
 
     public function deleteForUser($user, $id)

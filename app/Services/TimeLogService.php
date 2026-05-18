@@ -7,6 +7,7 @@ use App\Models\TimeLogEntry;
 use App\Models\UserLeave;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Enums\PaginationCount;
 
 class TimeLogService
 {

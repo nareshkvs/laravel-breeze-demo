@@ -6,6 +6,7 @@ use App\Models\UserLeave;
 use App\Models\TimeLog;
 use App\Enums\LeaveStatus;
 use Carbon\Carbon;
+use App\Enums\PaginationCount;
 
 class LeaveService
 {
@@ -73,7 +74,7 @@ class LeaveService
     /**
      * Paginated list of all leaves, optional filter by user_id
      */
-    public function listAllPaginated(int $perPage = 15, int|null $userId = null)
+    public function listAllPaginated(int $perPage = PaginationCount::ONE->value, int|null $userId = null)
     {
         return UserLeave::with('user')
             ->when($userId, function($q) use ($userId){ $q->where('user_id', $userId); })

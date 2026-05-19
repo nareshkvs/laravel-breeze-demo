@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Project;
 use App\Services\TimeLogService;
 use App\Services\LeaveService;
+use App\Http\Requests\StoreTimesheetRequest;
 
 
 class TimeLogController extends Controller
@@ -85,18 +86,12 @@ class TimeLogController extends Controller
     /**
      * Store time log entries for a date.
      */
-    public function store(Request $request)
+    public function store(StoreTimesheetRequest $request)
     {
         $user = Auth::user();
 
-        $request->validate([
-            'work_date' => ['required', 'date', 'before_or_equal:today'],
-            'entries' => ['required', 'array', 'min:1'],
-            'entries.*.project_id' => ['required', 'exists:projects,id'],
-            'entries.*.description' => ['required', 'string', 'max:1000'],
-            'entries.*.duration' => ['required', 'string'],
-        ]);
-
+        $validatedData = $request->validated();
+        
         try {
             $this->service->create($request->only(['work_date','entries']), $user);
             return redirect()->route('time-logs.index')->with('success', 'Time log saved.');
